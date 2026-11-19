@@ -1,0 +1,201 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@property --c1 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #6d4cff;
+}
+@property --c2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ff4f8b;
+}
+@property --c3 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #18c1ff;
+}
+
+:root {
+  --c1: #6d4cff;
+  --c2: #ff4f8b;
+  --c3: #18c1ff;
+  transition: --c1 1.5s ease, --c2 1.5s ease, --c3 1.5s ease;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  height: 100dvh;
+}
+
+body {
+  margin: 0;
+  background: #07070c;
+  color: #fff;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+[role='button'],
+[role='slider'] {
+  touch-action: manipulation;
+}
+
+@media (max-width: 767px) {
+  input,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@layer components {
+  /* ---------- Liquid glass surfaces ---------- */
+  .glass,
+  .glass-thin,
+  .glass-thick {
+    position: relative;
+    isolation: isolate;
+    background: rgba(255, 255, 255, 0.07);
+    -webkit-backdrop-filter: blur(var(--glass-blur, 40px)) saturate(1.5);
+    backdrop-filter: blur(var(--glass-blur, 40px)) saturate(1.5);
+    border: 1px solid;
+    /* top right bottom left: specular rim light from the top-left */
+    border-color: rgba(255, 255, 255, 0.25) rgba(255, 255, 255, 0.05) rgba(255, 255, 255, 0.05)
+      rgba(255, 255, 255, 0.25);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), inset 0 -1px 1px rgba(255, 255, 255, 0.04),
+      0 10px 40px -10px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  .glass-thin {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .glass-thick {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  /* subtle film grain */
+  .glass::before,
+  .glass-thin::before,
+  .glass-thick::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.08;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* liquid hover refraction: radial sheen following the pointer (--mx / --my) */
+  .glass-sheen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    background: radial-gradient(
+      260px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.05) 45%,
+      transparent 70%
+    );
+  }
+  .glass-sheen:hover::after {
+    opacity: 1;
+  }
+
+  .glass-btn {
+    @apply inline-flex items-center justify-center rounded-full text-white/70 transition-colors duration-200 hover:text-white hover:bg-white/10;
+  }
+  .glass-btn[data-active='true'] {
+    @apply text-white bg-white/15;
+  }
+}
+
+/* ---------- Ambient mesh ---------- */
+@keyframes drift-a {
+  0%,
+  100% {
+    transform: translate3d(-8%, -6%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(14%, 10%, 0) scale(1.18);
+  }
+}
+@keyframes drift-b {
+  0%,
+  100% {
+    transform: translate3d(10%, 8%, 0) scale(1.1);
+  }
+  50% {
+    transform: translate3d(-12%, -10%, 0) scale(0.92);
+  }
+}
+@keyframes drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 12%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-10%, -14%, 0) scale(1.22);
+  }
+}
+
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: var(--orb-opacity, 0.55);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb {
+    animation: none !important;
+  }
+}
+
+@keyframes vinyl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
